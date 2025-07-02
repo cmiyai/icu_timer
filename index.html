@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual Timer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    .timer-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .timer {
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 250px;
+    }
+
+    .timer h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 0.3rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .display {
+      font-size: 2rem;
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dual Timer</h1>
+
+  <div class="timer-container">
+    <div class="timer">
+      <h2>Timer 1</h2>
+      <label>Minutes: <input type="number" id="minutes1" value="1" min="0"/></label>
+      <div id="display1" class="display">01:00</div>
+    </div>
+
+    <div class="timer">
+      <h2>Timer 2</h2>
+      <label>Minutes: <input type="number" id="minutes2" value="2" min="0"/></label>
+      <div id="display2" class="display">02:00</div>
+    </div>
+  </div>
+
+  <button onclick="startTimers()">Start Both Timers</button>
+
+  <script>
+    let interval1, interval2;
+
+    function formatTime(seconds) {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function startTimers() {
+      clearInterval(interval1);
+      clearInterval(interval2);
+
+      let time1 = parseInt(document.getElementById("minutes1").value) * 60;
+      let time2 = parseInt(document.getElementById("minutes2").value) * 60;
+
+      document.getElementById("display1").textContent = formatTime(time1);
+      document.getElementById("display2").textContent = formatTime(time2);
+
+      interval1 = setInterval(() => {
+        if (time1 > 0) {
+          time1--;
+          document.getElementById("display1").textContent = formatTime(time1);
+        } else {
+          clearInterval(interval1);
+        }
+      }, 1000);
+
+      interval2 = setInterval(() => {
+        if (time2 > 0) {
+          time2--;
+          document.getElementById("display2").textContent = formatTime(time2);
+        } else {
+          clearInterval(interval2);
+        }
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>
