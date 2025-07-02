@@ -112,6 +112,11 @@
   </div>
 
   <script>
+    const timers = {
+      1: { interval: null, time: 0, remaining: 0 },
+      2: { interval: null, time: 0, remaining: 0 }
+    };
+  
 
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
