@@ -29,6 +29,11 @@
       border-radius: 1rem;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 280px;
+      transition: background-color 0.3s ease;
+    }
+
+    .timer.alarm {
+      background-color: #ff4d4d;
     }
 
     .timer h2 {
@@ -85,7 +90,7 @@
 
   <div class="timer-container">
     <!-- Timer 1 -->
-    <div class="timer">
+    <div class="timer" id="timerBox1">
       <h2>Timer 1</h2>
       <label>Minutes: <input type="number" id="minutes1" value="3" min="0"/></label>
       <div id="display1" class="display">03:00</div>
@@ -96,7 +101,7 @@
     </div>
 
     <!-- Timer 2 -->
-    <div class="timer">
+    <div class="timer" id="timerBox2">
       <h2>Timer 2</h2>
       <label>Minutes: <input type="number" id="minutes2" value="2" min="0"/></label>
       <div id="display2" class="display">02:00</div>
@@ -116,7 +121,6 @@
       1: { interval: null, time: 0, remaining: 0 },
       2: { interval: null, time: 0, remaining: 0 }
     };
-  
 
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -124,8 +128,22 @@
       return `${m}:${s}`;
     }
 
+    function playAlarmSound(duration = 2) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime); // High pitch beep
+      oscillator.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + duration);
+    }
+
     function startTimer(id) {
       clearInterval(timers[id].interval);
+
+      // Remove red background if it was triggered
+      document.getElementById(`timerBox${id}`).classList.remove('alarm');
+
       const minutes = parseInt(document.getElementById(`minutes${id}`).value) || 0;
       timers[id].time = minutes * 60;
       timers[id].remaining = timers[id].time;
@@ -137,6 +155,8 @@
           updateDisplay(id);
         } else {
           clearInterval(timers[id].interval);
+          playAlarmSound();  // 🔊 Play sound
+          document.getElementById(`timerBox${id}`).classList.add('alarm'); // 🔴 Turn red
         }
       }, 1000);
     }
@@ -145,6 +165,7 @@
       clearInterval(timers[id].interval);
       timers[id].remaining = parseInt(document.getElementById(`minutes${id}`).value || 0) * 60;
       updateDisplay(id);
+      document.getElementById(`timerBox${id}`).classList.remove('alarm'); // Reset red box
     }
 
     function updateDisplay(id) {
