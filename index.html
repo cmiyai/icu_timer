@@ -91,8 +91,6 @@
       <div id="display1" class="display">03:00</div>
       <div class="controls">
         <button onclick="startTimer(1)">Start</button>
-        <button onclick="pauseTimer(1)">Pause</button>
-        <button onclick="resumeTimer(1)">Resume</button>
         <button onclick="resetTimer(1)">Reset</button>
       </div>
     </div>
@@ -104,8 +102,6 @@
       <div id="display2" class="display">02:00</div>
       <div class="controls">
         <button onclick="startTimer(2)">Start</button>
-        <button onclick="pauseTimer(2)">Pause</button>
-        <button onclick="resumeTimer(2)">Resume</button>
         <button onclick="resetTimer(2)">Reset</button>
       </div>
     </div>
@@ -116,10 +112,6 @@
   </div>
 
   <script>
-    const timers = {
-      1: { time: 0, interval: null, isPaused: false, remaining: 0 },
-      2: { time: 0, interval: null, isPaused: false, remaining: 0 },
-    };
 
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -132,7 +124,6 @@
       const minutes = parseInt(document.getElementById(`minutes${id}`).value) || 0;
       timers[id].time = minutes * 60;
       timers[id].remaining = timers[id].time;
-      timers[id].isPaused = false;
       updateDisplay(id);
 
       timers[id].interval = setInterval(() => {
@@ -145,29 +136,9 @@
       }, 1000);
     }
 
-    function pauseTimer(id) {
-      clearInterval(timers[id].interval);
-      timers[id].isPaused = true;
-    }
-
-    function resumeTimer(id) {
-      if (timers[id].isPaused && timers[id].remaining > 0) {
-        timers[id].isPaused = false;
-        timers[id].interval = setInterval(() => {
-          if (timers[id].remaining > 0) {
-            timers[id].remaining--;
-            updateDisplay(id);
-          } else {
-            clearInterval(timers[id].interval);
-          }
-        }, 1000);
-      }
-    }
-
     function resetTimer(id) {
       clearInterval(timers[id].interval);
       timers[id].remaining = parseInt(document.getElementById(`minutes${id}`).value || 0) * 60;
-      timers[id].isPaused = false;
       updateDisplay(id);
     }
 
