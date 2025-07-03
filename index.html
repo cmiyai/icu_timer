@@ -118,58 +118,68 @@
 
   <script>
     const timers = {
-      1: { interval: null, time: 0, remaining: 0 },
-      2: { interval: null, time: 0, remaining: 0 }
+      1: { interval: null, duration: 0, startTime: null, endTime: null },
+      2: { interval: null, duration: 0, startTime: null, endTime: null }
     };
 
-    function formatTime(seconds) {
-      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const s = String(seconds % 60).padStart(2, '0');
-      return `${m}:${s}`;
+    function formatTime(ms) {
+      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${minutes}:${seconds}`;
     }
 
     function playAlarmSound(duration = 2) {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = ctx.createOscillator();
       oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(880, ctx.currentTime); // High pitch beep
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime);
       oscillator.connect(ctx.destination);
       oscillator.start();
       oscillator.stop(ctx.currentTime + duration);
     }
 
+    function updateTimer(id) {
+      const now = Date.now();
+      const timer = timers[id];
+      const remaining = Math.max(0, timer.endTime - now);
+      document.getElementById(`display${id}`).textContent = formatTime(remaining);
+
+      if (remaining <= 0) {
+        clearInterval(timer.interval);
+        document.getElementById(`timerBox${id}`).classList.add("alarm");
+        playAlarmSound();
+      }
+    }
+
     function startTimer(id) {
       clearInterval(timers[id].interval);
-
-      // Remove red background if it was triggered
-      document.getElementById(`timerBox${id}`).classList.remove('alarm');
+      document.getElementById(`timerBox${id}`).classList.remove("alarm");
 
       const minutes = parseInt(document.getElementById(`minutes${id}`).value) || 0;
-      timers[id].time = minutes * 60;
-      timers[id].remaining = timers[id].time;
-      updateDisplay(id);
+      const duration = minutes * 60 * 1000;
+      const now = Date.now();
 
-      timers[id].interval = setInterval(() => {
-        if (timers[id].remaining > 0) {
-          timers[id].remaining--;
-          updateDisplay(id);
-        } else {
-          clearInterval(timers[id].interval);
-          playAlarmSound();  // 🔊 Play sound
-          document.getElementById(`timerBox${id}`).classList.add('alarm'); // 🔴 Turn red
-        }
-      }, 1000);
+      timers[id].duration = duration;
+      timers[id].startTime = now;
+      timers[id].endTime = now + duration;
+
+      updateTimer(id);
+      timers[id].interval = setInterval(() => updateTimer(id), 250);
     }
 
     function resetTimer(id) {
       clearInterval(timers[id].interval);
-      timers[id].remaining = parseInt(document.getElementById(`minutes${id}`).value || 0) * 60;
-      updateDisplay(id);
-      document.getElementById(`timerBox${id}`).classList.remove('alarm'); // Reset red box
-    }
+      document.getElementById(`timerBox${id}`).classList.remove("alarm");
 
-    function updateDisplay(id) {
-      document.getElementById(`display${id}`).textContent = formatTime(timers[id].remaining);
+      const minutes = parseInt(document.getElementById(`minutes${id}`).value) || 0;
+      const duration = minutes * 60 * 1000;
+
+      timers[id].duration = duration;
+      timers[id].startTime = null;
+      timers[id].endTime = null;
+
+      document.getElementById(`display${id}`).textContent = formatTime(duration);
     }
 
     function startBothTimers() {
