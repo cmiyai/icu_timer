@@ -17,15 +17,6 @@ A simple and responsive dual countdown timer web application featuring two simul
 - Vanilla JavaScript for timer logic, asynchronous updates, and audio alarms.
 - Simple, lightweight design to ensure quick load and easy customization.
 
-## How to Use
-
-1. Open the `index.html` file in a modern web browser.
-2. Adjust the minutes for each timer using the input fields if needed.
-3. Use the **Start** button under each timer to begin countdown independently.
-4. Or use the **Start Both Timers** button to start both timers at once.
-5. When a timer reaches zero, its background will turn red and an alarm sound will play.
-6. Use the **Reset** button to reset a timer to the current input value.
-
 ## Potential Use Cases
 
 - ICU or medical settings to track critical timing intervals (e.g., CPR cycles).
